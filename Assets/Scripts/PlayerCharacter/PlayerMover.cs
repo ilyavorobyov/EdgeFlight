@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using EnvironmentData;
+using GameLogic;
+using System.Threading;
 using UI;
 using UI.MobileControlButtons;
 using UnityEngine;
@@ -11,12 +13,13 @@ namespace PlayerCharacter
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMover : MonoBehaviour
     {
+        private CancellationTokenSource _moveCancellationTokenSource;
         private DeviceChecker _deviceChecker;
         private MobileControlUpButton _mobileControlUpButton;
         private MobileControlDownButton _mobileControlDownButton;
         private PlayerInput _playerInput;
         private PlayerWeapon _playerWeapon;
-        private GameUI _gameUI;
+        private GameStateSwitcher _gameStateSwitcher;
         private Rigidbody2D _rb;
         private bool _isMobile;
         private bool _isMoveDown = false;
@@ -32,13 +35,13 @@ namespace PlayerCharacter
             MobileControlUpButton mobileControlUpButton,
             MobileControlDownButton mobileControlDownButton,
             PlayerWeapon playerWeapon,
-            GameUI gameUI)
+            GameStateSwitcher gameStateSwitcher)
         {
             _deviceChecker = deviceChecker;
             _mobileControlUpButton = mobileControlUpButton;
             _mobileControlDownButton = mobileControlDownButton;
             _playerWeapon = playerWeapon;
-            _gameUI = gameUI;
+            _gameStateSwitcher = gameStateSwitcher;
         }
 
         private void OnEnable()
@@ -46,7 +49,10 @@ namespace PlayerCharacter
             _rb = GetComponent<Rigidbody2D>();
             _isMobile = _deviceChecker.IsMobile;
             _currentSpeed = _startSpeed;
-            _gameUI.Started += OnGameStarted;
+            _gameStateSwitcher.Started += OnGameStarted;
+            _gameStateSwitcher.Paused += OnGamePaused;
+            _gameStateSwitcher.Resumed += OnGameResumed;
+            _gameStateSwitcher.Exited += OnExited;
 
             if (_isMobile)
             {
@@ -63,7 +69,10 @@ namespace PlayerCharacter
 
         private void OnDisable()
         {
-            _gameUI.Started += OnGameStarted;
+            _gameStateSwitcher.Started -= OnGameStarted;
+            _gameStateSwitcher.Paused -= OnGamePaused;
+            _gameStateSwitcher.Resumed -= OnGameResumed;
+            _gameStateSwitcher.Exited -= OnExited;
 
             if (_isMobile)
             {
@@ -112,35 +121,46 @@ namespace PlayerCharacter
             }
         }
 
-        private async UniTask Move()
+        private void ClearToken()
         {
-            var token = this.GetCancellationTokenOnDestroy();
-
-            while (_isPlaying && !token.IsCancellationRequested)
+            if (_moveCancellationTokenSource != null && !_moveCancellationTokenSource.IsCancellationRequested)
             {
-                if (_isMoveUp)
+                _moveCancellationTokenSource.Cancel();
+                _moveCancellationTokenSource.Dispose();
+                _moveCancellationTokenSource = null;
+            }
+        }
+
+        private async UniTask Move(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                if (_isPlaying)
                 {
-                    _rb.MovePosition(
-                        _rb.position +
-                        Vector2.up *
-                        _currentSpeed *
-                        Time.deltaTime);
-                }
-                else if (_isMoveDown)
-                {
-                    _rb.MovePosition(
-                        _rb.position +
-                        Vector2.down *
-                        _currentSpeed *
-                        Time.deltaTime);
-                }
-                else
-                {
-                    _rb.MovePosition(
-                        _rb.position +
-                        Vector2.down *
-                        _fallingSpeed *
-                        Time.deltaTime);
+                    if (_isMoveUp)
+                    {
+                        _rb.MovePosition(
+                            _rb.position +
+                            Vector2.up *
+                            _currentSpeed *
+                            Time.deltaTime);
+                    }
+                    else if (_isMoveDown)
+                    {
+                        _rb.MovePosition(
+                            _rb.position +
+                            Vector2.down *
+                            _currentSpeed *
+                            Time.deltaTime);
+                    }
+                    else
+                    {
+                        _rb.MovePosition(
+                            _rb.position +
+                            Vector2.down *
+                            _fallingSpeed *
+                            Time.deltaTime);
+                    }
                 }
 
                 await UniTask.NextFrame();
@@ -188,17 +208,31 @@ namespace PlayerCharacter
             }
 
             _isPlaying = true;
-            Move().Forget();
+            ClearToken();
+            _moveCancellationTokenSource = new CancellationTokenSource();
+            Move(_moveCancellationTokenSource.Token).Forget();
         }
 
         private void OnGamePaused()
         {
             if (!_isMobile)
-            {
                 _playerInput.Disable();
-            }
 
             _isPlaying = false;
+        }
+
+        private void OnGameResumed()
+        {
+            if (!_isMobile)
+                _playerInput.Enable();
+
+            _isPlaying = true;
+        }
+
+        private void OnExited()
+        {
+            _isPlaying = false;
+            ClearToken();
         }
     }
 }

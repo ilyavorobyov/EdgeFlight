@@ -1,4 +1,4 @@
-using CameraBehavior;
+using CameraBehaviour;
 using UnityEngine;
 using Zenject;
 

@@ -10,7 +10,8 @@ public class HighHeatTextIndicator : MonoBehaviour
 
     [Inject] private WeaponHeatMeter _weaponHeatMeter;
     [Inject(Id = HighHeatTextID)] private TMP_Text _highHeatText;
-    private float _highHeatValue = 0.8f;
+
+    private float _highHeatValue = 0.75f;
 
     private void Start()
     {
@@ -32,5 +33,4 @@ public class HighHeatTextIndicator : MonoBehaviour
     {
         _highHeatText.gameObject.SetActive(false);
     }
-
 }

@@ -679,7 +679,7 @@ PlayerSettings:
     ReservedCFE: DOTWEEN
     Standalone: PLUGIN_YG_2;TMP_YG2;DOTWEEN
     VisionOS: DOTWEEN
-    WebGL: PLUGIN_YG_2;TMP_YG2;InterstitialAdv_yg;EnvirData_yg;YandexGamesPlatform_yg;DOTWEEN
+    WebGL: PLUGIN_YG_2;TMP_YG2;InterstitialAdv_yg;EnvirData_yg;YandexGamesPlatform_yg;DOTWEEN;Localization_yg;AutoTranslateLangs_yg
     Windows Store Apps: DOTWEEN
     XboxOne: DOTWEEN
     iPhone: DOTWEEN

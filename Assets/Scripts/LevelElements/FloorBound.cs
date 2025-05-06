@@ -4,6 +4,8 @@ namespace LevelElements
 {
     public class FloorBound : Bounds
     {
+        private float _bottomOffset = 0.3f;
+
         public override void SetPosition()
         {
             transform.position = CalculatePosition();
@@ -13,7 +15,7 @@ namespace LevelElements
         {
             return new Vector3(
                 EdgeDetector.CenterX,
-                EdgeDetector.Bottom,
+                EdgeDetector.Bottom - _bottomOffset,
                 transform.position.z);
         }
     }

@@ -4,6 +4,8 @@ namespace LevelElements
 {
     public class CeilingBound : Bounds
     {
+        private float _topOffset = 0.3f;
+
         public override void SetPosition()
         {
             transform.position = CalculatePosition();
@@ -13,7 +15,7 @@ namespace LevelElements
         {
             return new Vector3(
                 EdgeDetector.CenterX,
-                EdgeDetector.Top,
+                EdgeDetector.Top + _topOffset,
                 transform.position.z);
         }
     }

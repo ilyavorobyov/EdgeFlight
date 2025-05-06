@@ -1,6 +1,6 @@
 namespace UI.MobileControlButtons
 {
-    public class MobileControlShootButton : UIButton
+    public class MobileControlShootButton : MobileControlButton
     {
     }
 }

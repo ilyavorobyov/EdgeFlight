@@ -8,13 +8,26 @@ namespace LevelElements
     {
         [Inject] protected EdgeDetector EdgeDetector;
 
+        [SerializeField] private bool _isRightSide;
+
+        protected float _xOffset = 25f;
+        protected float _xPos;
+
         private void Awake()
         {
             SetPosition();
         }
 
-        public abstract void SetPosition();
-
-        public abstract Vector3 CalculatePosition();
+        public virtual void SetPosition()
+        {
+            if (!_isRightSide)
+            {
+                _xPos = EdgeDetector.CenterX;
+            }
+            else
+            {
+                _xPos = EdgeDetector.CenterX + _xOffset;
+            }
+        }
     }
 }

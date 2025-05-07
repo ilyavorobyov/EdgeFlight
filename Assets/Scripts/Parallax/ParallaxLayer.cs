@@ -37,7 +37,7 @@ namespace Parallax
                 .AddTo(this);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (_isCanMove)
             {

@@ -8,13 +8,10 @@ namespace LevelElements
 
         public override void SetPosition()
         {
-            transform.position = CalculatePosition();
-        }
+            base.SetPosition();
 
-        public override Vector3 CalculatePosition()
-        {
-            return new Vector3(
-                EdgeDetector.CenterX,
+            transform.position = new Vector3(
+                _xPos,
                 EdgeDetector.Bottom - _bottomOffset,
                 transform.position.z);
         }

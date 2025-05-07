@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a5029b3e4574ff744949256c6981fe5f
+guid: a8090b53e99ce054cadb2d53472bc757
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6152950190354338441
-    second: BarBackGround_0
+      213: -156953211237355245
+    second: BarFilling2 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BarBackGround_0
+      name: BarFilling2 1_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 456
-        height: 60
+        width: 60
+        height: 456
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9821eb0399ba36550800000000000000
-      internalID: 6152950190354338441
+      spriteID: 31137ddc2e362ddf0800000000000000
+      internalID: -156953211237355245
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BarBackGround_0: 6152950190354338441
+      BarFilling2 1_0: -156953211237355245
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

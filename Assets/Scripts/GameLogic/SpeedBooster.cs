@@ -1,81 +1,83 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using GameLogic;
 using UniRx;
 using UnityEngine;
 using Zenject;
 
-public class SpeedBooster : MonoBehaviour
+namespace GameLogic
 {
-    [Inject] private GameStateSwitcher _gameStateSwitcher;
-
-    private CancellationTokenSource _increaseCancellationTokenSource;
-    private bool _isPlaying = false;
-    private float _delayBeforeIncrease = 2;
-    private float _additionAmount = 0.1f;
-    private float _maxSpeed = 5f;
-
-    private ReactiveProperty<float> _currentSpeed = new ReactiveProperty<float>();
-    private ReactiveProperty<float> _startSpeed = new ReactiveProperty<float>(1);
-    private ReactiveProperty<float> _stoppedSpeed = new ReactiveProperty<float>(0);
-
-    public IReadOnlyReactiveProperty<float> CurrentSpeed => _currentSpeed;
-
-    private void OnEnable()
+    public class SpeedBooster : MonoBehaviour
     {
-        _currentSpeed.Value = _stoppedSpeed.Value;
-        _gameStateSwitcher.Started += OnGameStarted;
-        _gameStateSwitcher.Exited += OnGameEnded;
-    }
+        [Inject] private GameStateSwitcher _gameStateSwitcher;
 
-    private void OnDisable()
-    {
-        _gameStateSwitcher.Started -= OnGameStarted;
-        _gameStateSwitcher.Exited -= OnGameEnded;
-    }
+        private CancellationTokenSource _increaseCancellationTokenSource;
+        private bool _isPlaying = false;
+        private float _delayBeforeIncrease = 2;
+        private float _additionAmount = 0.1f;
+        private float _maxSpeed = 5f;
 
-    private async UniTask Increase(CancellationToken token)
-    {
-        var coolingTickDelay = TimeSpan.FromSeconds(_delayBeforeIncrease);
+        private ReactiveProperty<float> _currentSpeed = new ReactiveProperty<float>();
+        private ReactiveProperty<float> _startSpeed = new ReactiveProperty<float>(1);
+        private ReactiveProperty<float> _stoppedSpeed = new ReactiveProperty<float>(0);
 
-        while (!token.IsCancellationRequested)
+        public IReadOnlyReactiveProperty<float> CurrentSpeed => _currentSpeed;
+
+        private void OnEnable()
         {
-            if (_isPlaying)
-            {
-                await UniTask.Delay(coolingTickDelay, cancellationToken: token);
+            _currentSpeed.Value = _stoppedSpeed.Value;
+            _gameStateSwitcher.Started += OnGameStarted;
+            _gameStateSwitcher.Exited += OnGameEnded;
+        }
 
-                if (!Mathf.Approximately(_currentSpeed.Value, _maxSpeed))
+        private void OnDisable()
+        {
+            _gameStateSwitcher.Started -= OnGameStarted;
+            _gameStateSwitcher.Exited -= OnGameEnded;
+        }
+
+        private async UniTask Increase(CancellationToken token)
+        {
+            var coolingTickDelay = TimeSpan.FromSeconds(_delayBeforeIncrease);
+
+            while (!token.IsCancellationRequested)
+            {
+                if (_isPlaying)
                 {
-                    _currentSpeed.Value += _additionAmount;
+                    await UniTask.Delay(coolingTickDelay, cancellationToken: token);
+
+                    if (!Mathf.Approximately(_currentSpeed.Value, _maxSpeed))
+                    {
+                        _currentSpeed.Value += _additionAmount;
+                    }
                 }
             }
         }
-    }
 
-    private void ClearToken()
-    {
-        if (_increaseCancellationTokenSource != null && !_increaseCancellationTokenSource.IsCancellationRequested)
+        private void ClearToken()
         {
-            _increaseCancellationTokenSource.Cancel();
-            _increaseCancellationTokenSource.Dispose();
-            _increaseCancellationTokenSource = null;
+            if (_increaseCancellationTokenSource != null && !_increaseCancellationTokenSource.IsCancellationRequested)
+            {
+                _increaseCancellationTokenSource.Cancel();
+                _increaseCancellationTokenSource.Dispose();
+                _increaseCancellationTokenSource = null;
+            }
         }
-    }
 
-    private void OnGameStarted()
-    {
-        ClearToken();
-        _increaseCancellationTokenSource = new CancellationTokenSource();
-        _currentSpeed.Value = _startSpeed.Value;
-        _isPlaying = true;
-        Increase(_increaseCancellationTokenSource.Token).Forget();
-    }
+        private void OnGameStarted()
+        {
+            ClearToken();
+            _increaseCancellationTokenSource = new CancellationTokenSource();
+            _currentSpeed.Value = _startSpeed.Value;
+            _isPlaying = true;
+            Increase(_increaseCancellationTokenSource.Token).Forget();
+        }
 
-    private void OnGameEnded()
-    {
-        _currentSpeed.Value = _stoppedSpeed.Value;
-        _isPlaying = false;
-        ClearToken();
+        private void OnGameEnded()
+        {
+            _currentSpeed.Value = _stoppedSpeed.Value;
+            _isPlaying = false;
+            ClearToken();
+        }
     }
 }

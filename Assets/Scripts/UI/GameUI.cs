@@ -23,6 +23,7 @@ namespace UI
         [SerializeField] private Button _exitGameOverPanelButton;
         [SerializeField] private PausePanel _pausePanel;
         [SerializeField] private GameOverPanel _gameOverPanel;
+        [SerializeField] private GameObject _distanceCounterView;
 
         private GameStateSwitcher _gameStateSwitcher;
         private MobileControlUpButton _mobileControlUpButton;
@@ -109,6 +110,7 @@ namespace UI
             StartButtonPressed?.Invoke();
             _uiStretchAnimation.Disappear(_startButton.gameObject);
             _uiStretchAnimation.Appear(_pauseButton.gameObject);
+            _uiStretchAnimation.Appear(_distanceCounterView.gameObject);
             _weaponHeatMeterBar.alpha = _visibleAlpha;
             _isVisible = true;
             SetMobileControlsVisible(_isVisible);
@@ -146,6 +148,7 @@ namespace UI
             _weaponHeatMeterBar.alpha = _invisibleAlpha;
             _uiStretchAnimation.Disappear(_pausePanel.gameObject);
             _uiStretchAnimation.Appear(_startButton.gameObject);
+            _uiStretchAnimation.Disappear(_distanceCounterView.gameObject);
             _isVisible = false;
             SetMobileControlsVisible(_isVisible);
 
